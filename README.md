@@ -9,7 +9,7 @@ Afterwards, the program reads through all auditorium files in the folder, and de
 tickets have been sold. It outputs the total revenue generated and seats reserved. Adult tickets cost $10, senior tickets cost $7.50, and 
 child tickets cost $5.
 
-The file(s) containing an auditorium must be formatted like this:
+The file(s) containing an auditorium must be formatted like this (without empty lines between rows):
 
 A....C..S
 
