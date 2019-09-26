@@ -10,8 +10,11 @@ tickets have been sold. It outputs the total revenue generated and seats reserve
 child tickets cost $5.
 
 The file(s) containing an auditorium must be formatted like this:
+
 A....C..S
+
 SSS......
+
 ...AAA...
 
 A represents adult, S represents senior, and C represents child. Each '.' represents an available seat in the auditorium. The auditorium 
