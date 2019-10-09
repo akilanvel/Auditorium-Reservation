@@ -19,3 +19,5 @@ SSS......
 
 A represents adult, S represents senior, and C represents child. Each '.' represents an available seat in the auditorium. The auditorium 
 above has 3 rows and 9 columns. Each auditorium in the theater (folder) can be of different size. 
+
+Example auditorium files are included (titled "input1.txt" and "input2.txt").
