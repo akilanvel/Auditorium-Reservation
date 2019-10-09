@@ -1,14 +1,12 @@
-//Name: Akilan Gnanavel
-//NET ID: AXG180113
-//final version!
-
 package Tickets;
 
 import java.util.Scanner;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
 public class Main {
+	@SuppressWarnings("resource")
 	public static void main(String[] args) throws Exception {
 		Scanner scanner = new Scanner(System.in);
 
@@ -17,8 +15,24 @@ public class Main {
 		// get the name of text file and create a file object for it
 		System.out.println("Which auditorium would you like to read from?");
 		String numAuditorium = scanner.nextLine();
-		File file = new File(numAuditorium + ".txt");
-		Scanner fileReader = new Scanner(file);
+
+		// scanner object through which we will read from the requested auditorium
+		Scanner fileReader = new Scanner(System.in);
+
+		// open the file and catch the FileNotFoundException if the file isn't found
+		// keep prompting the user for the auditorium file until they enter a valid one
+		boolean fileFound = false;
+		while (!fileFound) {
+			try {
+				File file = new File(numAuditorium + ".txt");
+				fileReader = new Scanner(file);
+				fileFound = true;
+			} catch (FileNotFoundException e) {
+				System.out.println("The entered auditorium was not found");
+				System.out.println("Which auditorium would you like to read from?");
+				numAuditorium = scanner.nextLine();
+			}
+		}
 
 		// create a 2D char array for the auditorium and initialize it
 		char[][] auditorium = readInitialAuditorium(fileReader);
@@ -39,7 +53,7 @@ public class Main {
 			int numChild = 0;
 			int numSenior = 0;
 
-			if (!input.equals("Reserve") && !input.equals("Exit")) { // incase they enter an invalid menu option
+			if (!input.equals("Reserve") && !input.equals("Exit")) { // in case they enter an invalid menu option
 				System.out.println("Invalid menu option");
 			} else if (input.equals("Reserve")) {
 				// get input for all the previous declared variables in order to reserve seats
@@ -138,11 +152,10 @@ public class Main {
 		double ticketSales = 0;
 		int totalSales = 0;
 
+		// create a folder and files array to hold all the files in the current folder
 		File folder = new File(System.getProperty("user.dir"));
 		File[] listOfFiles = folder.listFiles();
-		// ArrayList<char[][]> tempA = new ArrayList<char[][]>();
-
-		// go through each file individually (if its a .txt file) and read info
+		// go through each file individually (if its a .txt file) and read information
 		for (int i = 0; i < listOfFiles.length; i++) {
 			File tempFile = listOfFiles[i];
 			if (tempFile.isFile() && tempFile.getName().toLowerCase().endsWith(".txt")) {
@@ -168,13 +181,16 @@ public class Main {
 		}
 		ticketSales = ((double) totalAdult * 10.0) + ((double) totalChild * 5.0) + ((double) totalSenior * 7.5);
 
-		// print out the final information
+		// print out the final information for all auditoriums in the theater
 		System.out.println("Total seats in all auditoriums: " + totalSeats);
 		System.out.println("Total tickets sold: " + totalSales);
 		System.out.println("Total adult tickets sold: " + totalAdult);
 		System.out.println("Total child tickets sold: " + totalChild);
 		System.out.println("Total senior tickets sold: " + totalSenior);
 		System.out.println("Total ticket sales: $" + ticketSales + "0");
+
+		// close scanner
+		fileReader.close();
 	}
 
 	// method for reading in an auditorium from a text file
@@ -411,11 +427,11 @@ public class Main {
 			System.out.println("");
 		}
 
-		//print out each row with spaces between the seats
+		// print out each row with spaces between the seats
 		for (int i = 0; i < auditorium.length; i++) {
 			System.out.print((i + 1) + " "); // prints row number
 			for (int x = 0; x < auditorium[i].length; x++) {
-				//print out a # if there is a seat reserved
+				// print out a # if there is a seat reserved
 				if (auditorium[i][x] != '.' && auditorium[i][x] != '#') {
 					System.out.print("# ");
 				} else {
