@@ -6,21 +6,22 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
 public class Main {
-	@SuppressWarnings("resource")
 	public static void main(String[] args) throws Exception {
 		Scanner scanner = new Scanner(System.in);
 
 		String input = "";
 
-		// get the name of text file and create a file object for it
+		// Get the name of the file containing the auditorium
 		System.out.println("Which auditorium would you like to read from?");
 		String numAuditorium = scanner.nextLine();
 
-		// scanner object through which we will read from the requested auditorium
+		// Initialize Scanner object through which we will read from the requested
+		// auditorium
 		Scanner fileReader = new Scanner(System.in);
 
-		// open the file and catch the FileNotFoundException if the file isn't found
-		// keep prompting the user for the auditorium file until they enter a valid one
+		// Open the file, but make sure the file exists
+		// Keep prompting the user for the auditorium file until they enter a valid one
+		// if the original was invalid
 		boolean fileFound = false;
 		while (!fileFound) {
 			try {
@@ -34,29 +35,30 @@ public class Main {
 			}
 		}
 
-		// create a 2D char array for the auditorium and initialize it
+		// Create a 2D char array to house the auditorium
 		char[][] auditorium = readInitialAuditorium(fileReader);
 
 		printUser(auditorium);
 
-		// start the program loop
+		// Start the program loop
 		do {
-			// get the user's decision
+			// Get the user's decision
 			System.out.println("1. Reserve");
 			System.out.println("2. Exit");
 			input = scanner.nextLine();
 
-			// declare variables that the user will enter for reservation
+			// Declare variables that the user will enter for reservation
 			int rowNumber = 0;
 			char startingSeatLetter = '0';
 			int numAdult = 0;
 			int numChild = 0;
 			int numSenior = 0;
 
-			if (!input.equals("Reserve") && !input.equals("Exit")) { // in case they enter an invalid menu option
+			if (!input.equals("Reserve") && !input.equals("Exit")) { // If the user enters an invalid menu option, tell
+																		// them it was invalid
 				System.out.println("Invalid menu option");
-			} else if (input.equals("Reserve")) {
-				// get input for all the previous declared variables in order to reserve seats
+			} else if (input.equals("Reserve")) { // If the user decides to reserve a seat
+				// Get the details of the seat and make sure it is valid
 				System.out.println("Please enter the row number");
 				rowNumber = scanner.nextInt();
 				scanner.nextLine();
@@ -99,10 +101,11 @@ public class Main {
 					scanner.nextLine();
 				}
 
-				// to account that arrays have starting index 0
+				// To account that arrays have starting index 0
 				rowNumber--;
 				columnNumber--;
 
+				// Check if the requested seats are available
 				boolean available = true;
 				int totalSeats = numChild + numAdult + numSenior;
 				// check if all of the seats together fit within the row
@@ -111,10 +114,12 @@ public class Main {
 						available = false;
 					}
 				}
-				if (available) { // reserve the seats if they are available
+
+				if (available) { // Reserve the seats if they are available
 					auditorium = reserveSeats(auditorium, numAdult, numChild, numSenior, rowNumber, columnNumber);
 					System.out.println("Done!");
-				} else { // recommend different seats and reserve them if the user decides to
+				} else { // Recommend different seats and reserve them if the user decides to (if the
+							// seats aren't available
 					System.out.println("Those seats are not available");
 					auditorium = recommendSeats(rowNumber, columnNumber, numAdult, numChild, numSenior, auditorium,
 							scanner);
@@ -124,9 +129,8 @@ public class Main {
 
 			}
 
-			// create an auditorium with a string array to read into the file as a string
+			// Create a String array to hold each line of the auditorium
 			String[] tempAuditorium = new String[auditorium.length];
-
 			for (int i = 0; i < tempAuditorium.length; i++) {
 				tempAuditorium[i] = "";
 			}
@@ -136,7 +140,7 @@ public class Main {
 				}
 			}
 
-			// read the auditorium (in string format) into the file
+			// Write the auditorium into the original file one row at a time
 			PrintWriter print = new PrintWriter(numAuditorium + ".txt");
 			for (int i = 0; i < tempAuditorium.length; i++) {
 				print.println(tempAuditorium[i]);
@@ -144,7 +148,8 @@ public class Main {
 			print.close();
 		} while (!input.equals("Exit"));
 
-		// print final report
+		// Declare variables to hold the final values for all auditoriums in the
+		// directory
 		int totalSeats = 0;
 		int totalAdult = 0;
 		int totalChild = 0;
@@ -152,10 +157,10 @@ public class Main {
 		double ticketSales = 0;
 		int totalSales = 0;
 
-		// create a folder and files array to hold all the files in the current folder
+		// Loop through every auditorium file in the directory
 		File folder = new File(System.getProperty("user.dir"));
 		File[] listOfFiles = folder.listFiles();
-		// go through each file individually (if its a .txt file) and read information
+		// Read the information from the auditorium file if it is an auditorium file
 		for (int i = 0; i < listOfFiles.length; i++) {
 			File tempFile = listOfFiles[i];
 			if (tempFile.isFile() && tempFile.getName().toLowerCase().endsWith(".txt")) {
@@ -181,7 +186,7 @@ public class Main {
 		}
 		ticketSales = ((double) totalAdult * 10.0) + ((double) totalChild * 5.0) + ((double) totalSenior * 7.5);
 
-		// print out the final information for all auditoriums in the theater
+		// Print out the final information for all auditoriums in the theater
 		System.out.println("Total seats in all auditoriums: " + totalSeats);
 		System.out.println("Total tickets sold: " + totalSales);
 		System.out.println("Total adult tickets sold: " + totalAdult);
@@ -189,13 +194,14 @@ public class Main {
 		System.out.println("Total senior tickets sold: " + totalSenior);
 		System.out.println("Total ticket sales: $" + ticketSales + "0");
 
-		// close scanner
+		// Close the scanner
 		fileReader.close();
 	}
 
-	// method for reading in an auditorium from a text file
+	// This method reads an auditorium file and returns a 2D char array containing
+	// the auditorium
 	public static char[][] readInitialAuditorium(Scanner fileReader) throws Exception {
-		// read the rows as complete strings first
+		// Read the rows into a 2D array as complete strings first
 		String[] tempAuditorium = new String[10];
 		for (int i = 0; i < tempAuditorium.length; i++) {
 			tempAuditorium[i] = "no row";
@@ -209,8 +215,7 @@ public class Main {
 			}
 		}
 
-		// set the number of rows and the number of columns in the auditorium based off
-		// of the strings we read earlier
+		// Determine the number of rows and columns in the auditorium
 		int numRows = 0;
 		int numColumns = tempAuditorium[0].length();
 		for (int i = 0; i < tempAuditorium.length; i++) {
@@ -220,7 +225,8 @@ public class Main {
 			}
 		}
 
-		// split up the string array into chars and read it into the auditorium 2D array
+		// Split up the string array into chars and read it into the auditorium 2D char
+		// array
 		char[][] initialAuditorium = new char[numRows][numColumns];
 		for (int i = 0; i < initialAuditorium.length; i++) {
 			for (int x = 0; x < initialAuditorium[i].length; x++) {
@@ -231,14 +237,15 @@ public class Main {
 		return initialAuditorium;
 	}
 
-	// recommend seats if those that the user wanted at first are not available
+	// This method recommends seats that are closest to the middle of a requested
+	// row
 	public static char[][] recommendSeats(int rowNumber, int columnNumber, int numAdult, int numChild, int numSenior,
 			char[][] auditorium, Scanner scanner) {
 		String recommendation = "No available seats matching the criteria in row " + (rowNumber + 1);
 		int numSeats = numAdult + numChild + numSenior;
 		int startingIndex = -1;
 
-		// find the starting index of where the reservation seats will be in the middle
+		// Find the starting index of where the reservation seats will be in the middle
 		// of the row
 		int startTesting = -1;
 		String row = "";
@@ -247,7 +254,7 @@ public class Main {
 			row += Character.toString(auditorium[rowNumber][i]);
 		}
 
-		// if the entire row is full, there cannot be recommendations
+		// Account for the entire row being full
 		boolean full = true;
 		for (int i = 0; i < row.length(); i++) {
 			if (row.substring(i, i + 1).contentEquals(".")) {
@@ -299,8 +306,9 @@ public class Main {
 			}
 		}
 
-		// start moving left and right of the middle and the moment the seats fit, we
-		// can break the loop and recommend these seats
+		// Start moving left and right of the middle of the row. If the seats fit, break
+		// the process. If the entire loop executes without giving a recommendation,
+		// there is no room in the row to reserve the requested seats.
 		int x;
 		int y;
 		if (startTesting != -1) {
@@ -342,7 +350,7 @@ public class Main {
 			}
 		}
 
-		// if there is an applicable recommendation
+		// If there is an applicable recommendation, print it
 		if (startingIndex != -1) {
 			recommendation = "You can reserve " + numSeats + " seats starting at seat "
 					+ ((char) ((startingIndex + 1) + 64)) + " on row " + (rowNumber + 1);
@@ -350,14 +358,15 @@ public class Main {
 
 		char decision = 'L';
 		System.out.println(recommendation);
-		// get the user's decision on whether they want to reserve
+
+		// Get the user's decision on whether they want to reserve the recommended seats
 		if (startingIndex != -1) {
 			System.out.println("Enter Y if you would like to reserve these, or N if not");
 			decision = scanner.next().charAt(0);
 			scanner.nextLine();
 		}
 
-		// if they want to reserve, call the reserveSeats method
+		// If they want to reserve, call the reserveSeats method
 		if (decision == 'Y') {
 			auditorium = reserveSeats(auditorium, numAdult, numChild, numSenior, rowNumber, startingIndex);
 			System.out.println("Done!");
@@ -366,10 +375,12 @@ public class Main {
 		return auditorium;
 	}
 
-	// this method reserves seats
+	// This method reserves seats in an auditorium given the row number, starting
+	// column number, and the number of people. It returns a 2D array containing the
+	// updated auditorium.
 	public static char[][] reserveSeats(char[][] auditorium, int numAdult, int numChild, int numSenior, int rowNumber,
 			int columnNumber) {
-		// read the auditorium into a temporary 2D char array
+		// Read the auditorium into a temporary 2D char array
 		char[][] seatType = new char[auditorium.length][auditorium[0].length];
 		for (int i = 0; i < seatType.length; i++) {
 			for (int x = 0; x < seatType[i].length; x++) {
@@ -377,7 +388,7 @@ public class Main {
 			}
 		}
 
-		// create a string to hold the seats you are trying to reserve
+		// Create a string to hold the seats you are trying to reserve
 		String reservation = "";
 		while (numAdult > 0) {
 			reservation += "A";
@@ -392,7 +403,7 @@ public class Main {
 			numSenior--;
 		}
 
-		// input the reservation string into the temporary auditorium char[] array
+		// Insert the reservation string into the temporary auditorium char[] array
 		// (reserving the seats)
 		int counter = 0;
 		while (reservation.length() > 0) {
@@ -401,7 +412,7 @@ public class Main {
 			counter++;
 		}
 
-		// update the real auditorium variable by copying the temporary one to it
+		// Update the real auditorium variable by copying the temporary one to it
 		for (int i = 0; i < auditorium.length; i++) {
 			for (int x = 0; x < auditorium[i].length; x++) {
 				auditorium[i][x] = seatType[i][x];
@@ -411,9 +422,10 @@ public class Main {
 		return auditorium;
 	}
 
-	// print the auditorium in a user-friendly way
+	// This method prints the auditorium in a user-friendly manner with the reserved
+	// seats represented as '#'
 	public static void printUser(char[][] auditorium) {
-		// print out the column letters
+		// Print the column letters
 		System.out.print("  ");
 		if (auditorium[0].length % 2 == 0) {
 			for (int i = 0; i < auditorium[0].length; i++) {
@@ -427,7 +439,7 @@ public class Main {
 			System.out.println("");
 		}
 
-		// print out each row with spaces between the seats
+		// Print each individual row with spaces between the seats
 		for (int i = 0; i < auditorium.length; i++) {
 			System.out.print((i + 1) + " "); // prints row number
 			for (int x = 0; x < auditorium[i].length; x++) {
